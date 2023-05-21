@@ -1,5 +1,10 @@
+import "package:cloud_firestore/cloud_firestore.dart";
+import "package:firebase_auth/firebase_auth.dart";
 import "package:flutter/cupertino.dart";
+import "package:flutter/foundation.dart";
 import "package:flutter/material.dart";
+import "package:wato/analytics/analytics.dart";
+import "package:wato/login/login_Page.dart";
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -11,6 +16,9 @@ class ProfilePage extends StatefulWidget {
 class ProfilePageState extends State<ProfilePage> {
   bool isNightMode = false;
   bool isNotifyMode = false;
+  bool isDarkMode = false;
+  bool isLightMode = false;
+  final userId = FirebaseAuth.instance.currentUser!.uid;
 
   @override
   Widget build(BuildContext context) {
@@ -51,26 +59,63 @@ class ProfilePageState extends State<ProfilePage> {
                   bottom: 0,
                   right: 143,
                   child: Container(
-                      alignment: Alignment.center,
-                      height: size.height * 0.03,
-                      width: size.width * 0.2,
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.rectangle,
-                        color: Colors.green,
-                        borderRadius: BorderRadius.all(Radius.circular(20)),
-                      ),
-                      child: const Text("Nison")),
+                    alignment: Alignment.center,
+                    height: size.height * 0.03,
+                    width: size.width * 0.2,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.rectangle,
+                      color: Colors.green,
+                      borderRadius: BorderRadius.all(Radius.circular(20)),
+                    ),
+                    child: StreamBuilder(
+                      stream: FirebaseFirestore.instance
+                          .collection("users")
+                          .doc(userId)
+                          .snapshots(),
+                      builder:
+                          (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                        RegExp regex = RegExp(r'^(\S+)');
+                        String firstName = regex
+                                .firstMatch(snapshot.data!["name"])
+                                ?.group(1) ??
+                            '';
+
+                        if (snapshot.hasData) {
+                          return Text(firstName,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                              ));
+                        } else {
+                          return const Text("Loading...");
+                        }
+                      },
+                    ),
+                  ),
                 ),
               ]),
               SizedBox(
                 height: size.height * 0.02,
               ),
-              const Text("Katerega Nicholas",
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                  )),
+              StreamBuilder(
+                stream: FirebaseFirestore.instance
+                    .collection("users")
+                    .doc(userId)
+                    .snapshots(),
+                builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                  if (snapshot.hasData) {
+                    return Text(snapshot.data!["name"],
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                        ));
+                  } else {
+                    return const Text("Loading...");
+                  }
+                },
+              ),
               SizedBox(
                 height: size.height * 0.02,
               ),
@@ -208,7 +253,13 @@ class ProfilePageState extends State<ProfilePage> {
                   Padding(
                       padding: const EdgeInsets.only(left: 20),
                       child: TextButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        const AnalyticsScreen()));
+                          },
                           child: const Text(
                             "About",
                             textAlign: TextAlign.left,
@@ -232,7 +283,9 @@ class ProfilePageState extends State<ProfilePage> {
                   Padding(
                       padding: const EdgeInsets.only(left: 20),
                       child: TextButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          _logout();
+                        },
                         child: const Text("Logout",
                             textAlign: TextAlign.left,
                             style: TextStyle(
@@ -245,6 +298,42 @@ class ProfilePageState extends State<ProfilePage> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Future<String?> getUsername(String userId) async {
+    try {
+      DocumentSnapshot snapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .get();
+      return snapshot.get('name');
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error getting username: $e');
+      }
+      return null;
+    }
+  }
+
+  Future<void> _logout() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Confirmation'),
+        content: const Text('Are you sure you want to log out?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pushReplacement(context,
+                MaterialPageRoute(builder: (context) => const LoginPage())),
+            child: const Text('Logout'),
+          ),
+        ],
       ),
     );
   }

@@ -1,5 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:wato/profile/profile_page.dart';
+import 'package:wato/login/login_Page.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({Key? key}) : super(key: key);
@@ -13,6 +15,13 @@ class RegisterPageState extends State<RegisterPage> {
   String? selectedCourse;
   String? selectedCountryCode;
   List<String>? countryCodes;
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _regNumberController = TextEditingController();
+  final TextEditingController _phoneNumberController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
 
   @override
   void initState() {
@@ -61,8 +70,9 @@ class RegisterPageState extends State<RegisterPage> {
             width: size.width * 0.8,
             child: Column(
               children: [
-                const TextField(
-                  decoration: InputDecoration(
+                TextField(
+                  controller: _nameController,
+                  decoration: const InputDecoration(
                     hintText: "Name",
                     prefixIcon: Icon(Icons.person),
                     border: OutlineInputBorder(
@@ -73,7 +83,8 @@ class RegisterPageState extends State<RegisterPage> {
                 SizedBox(
                   height: size.height * 0.02,
                 ),
-                const TextField(
+                TextField(
+                  controller: _regNumberController,
                   decoration: InputDecoration(
                     hintText: "Registration Number",
                     prefixIcon: Icon(Icons.person),
@@ -134,6 +145,7 @@ class RegisterPageState extends State<RegisterPage> {
                     SizedBox(width: size.width * 0.02),
                     Expanded(
                       child: TextFormField(
+                        controller: _phoneNumberController,
                         keyboardType: TextInputType.phone,
                         decoration: const InputDecoration(
                           labelText: 'Phone Number',
@@ -149,8 +161,9 @@ class RegisterPageState extends State<RegisterPage> {
                 SizedBox(
                   height: size.height * 0.02,
                 ),
-                const TextField(
-                  decoration: InputDecoration(
+                TextField(
+                  controller: _emailController,
+                  decoration: const InputDecoration(
                     hintText: "Email",
                     prefixIcon: Icon(Icons.email),
                     border: OutlineInputBorder(
@@ -161,8 +174,9 @@ class RegisterPageState extends State<RegisterPage> {
                 SizedBox(
                   height: size.height * 0.02,
                 ),
-                const TextField(
-                  decoration: InputDecoration(
+                TextField(
+                  controller: _passwordController,
+                  decoration: const InputDecoration(
                     hintText: "Password",
                     prefixIcon: Icon(Icons.lock),
                     border: OutlineInputBorder(
@@ -173,8 +187,9 @@ class RegisterPageState extends State<RegisterPage> {
                 SizedBox(
                   height: size.height * 0.02,
                 ),
-                const TextField(
-                  decoration: InputDecoration(
+                TextField(
+                  controller: _confirmPasswordController,
+                  decoration: const InputDecoration(
                     hintText: "Confirm Password",
                     prefixIcon: Icon(Icons.lock),
                     border: OutlineInputBorder(
@@ -195,11 +210,7 @@ class RegisterPageState extends State<RegisterPage> {
                     ),
                   ),
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const ProfilePage()),
-                    );
+                    register();
                   },
                   child: const Text(
                     "Sign Up",
@@ -219,5 +230,86 @@ class RegisterPageState extends State<RegisterPage> {
         ]),
       ),
     ));
+  }
+
+  void register() async {
+    // Get the values from the form fields
+    String name = _nameController.text;
+    String regNumber = _regNumberController.text;
+    String phoneNumber = _phoneNumberController.text;
+    String email = _emailController.text;
+    String password = _passwordController.text;
+    String confirmPassword = _confirmPasswordController.text;
+
+    // Validate the form fields
+    if (name.isEmpty) {
+      _showErrorSnackBar('Name is required');
+      return;
+    }
+    if (regNumber.isEmpty) {
+      _showErrorSnackBar('Registration number is required');
+      return;
+    }
+    if (selectedCourse == null) {
+      _showErrorSnackBar('Please select a course');
+      return;
+    }
+    if (phoneNumber.isEmpty) {
+      _showErrorSnackBar('Phone number is required');
+      return;
+    }
+    if (email.isEmpty) {
+      _showErrorSnackBar('Email is required');
+      return;
+    }
+    if (password.isEmpty) {
+      _showErrorSnackBar('Password is required');
+      return;
+    }
+    if (confirmPassword.isEmpty) {
+      _showErrorSnackBar('Confirm password is required');
+      return;
+    }
+    if (password != confirmPassword) {
+      _showErrorSnackBar('Passwords do not match');
+      return;
+    }
+
+    try {
+      // Create a new user in Firebase Authentication
+      UserCredential userCredential =
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
+      // Save user data to Firebase Firestore
+      FirebaseFirestore.instance
+          .collection('users')
+          .doc(userCredential.user!.uid)
+          .set({
+        'name': name,
+        'regNumber': regNumber,
+        'course': selectedCourse!,
+        'phoneNumber': phoneNumber,
+        'email': email,
+      });
+
+      // Navigate to the profile page
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginPage()),
+      );
+    } catch (e) {
+      _showErrorSnackBar('Registration failed: $e');
+    }
+  }
+
+  void _showErrorSnackBar(String message) {
+    final snackBar = SnackBar(
+      content: Text(message),
+      backgroundColor: Colors.red,
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 }

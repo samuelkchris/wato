@@ -1,5 +1,6 @@
 import "package:flutter/material.dart";
 import 'package:wato/home/custom_widgets.dart';
+import 'package:wato/notification/notifcation_s.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -10,13 +11,28 @@ class HomePage extends StatefulWidget {
 
 class HomePageState extends State<HomePage> {
   List<Option> options = [
-    const Option(icon: Icons.note_alt_sharp, name: 'Class'),
-    const Option(icon: Icons.video_collection_outlined, name: 'Recent Class'),
-    const Option(icon: Icons.group, name: 'Group Discussion'),
-    const Option(icon: Icons.school_rounded, name: 'Progress Tracker'),
     const Option(
-        icon: Icons.sticky_note_2_sharp, name: 'Past Papers Solutions'),
-    const Option(icon: Icons.featured_play_list_outlined, name: 'Assignments'),
+        icon: Icons.note_alt_sharp, name: 'Class', route: '/LearnScreen'),
+    const Option(
+        icon: Icons.video_collection_outlined,
+        name: 'Recent Class',
+        route: '/RecentClass'),
+    const Option(
+        icon: Icons.group,
+        name: 'Group Discussion',
+        route: '/GroupDiscussionScreen'),
+    const Option(
+        icon: Icons.school_rounded,
+        name: 'Progress Tracker',
+        route: '/AnalyticsScreen'),
+    const Option(
+        icon: Icons.sticky_note_2_sharp,
+        name: 'Past Papers Solutions',
+        route: '/past_papers_solutions'),
+    const Option(
+        icon: Icons.featured_play_list_outlined,
+        name: 'Assignments',
+        route: '/Assignments'),
   ];
   @override
   Widget build(BuildContext context) {
@@ -43,7 +59,13 @@ class HomePageState extends State<HomePage> {
                     iconSize: 30,
                     icon: const Icon(Icons.notifications),
                     color: Colors.white,
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const NotificationScreen()),
+                      );
+                    },
                   ),
                 ),
                 const Center(
@@ -71,29 +93,34 @@ class HomePageState extends State<HomePage> {
                   mainAxisSpacing: 20,
                   crossAxisCount: 2, // Two columns
                   children: options.map((option) {
-                    return Container(
-                      decoration: const BoxDecoration(
-                        color: Colors.green,
-                        borderRadius: BorderRadius.all(Radius.circular(20)),
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            option.icon,
-                            color: Colors.white,
-                            size: 60,
-                          ),
-                          Text(
-                            option.name,
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              color: Colors.black,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.pushNamed(context, option.route);
+                      },
+                      child: Container(
+                        decoration: const BoxDecoration(
+                          color: Colors.green,
+                          borderRadius: BorderRadius.all(Radius.circular(20)),
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              option.icon,
+                              color: Colors.white,
+                              size: 60,
                             ),
-                          ),
-                        ],
+                            Text(
+                              option.name,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     );
                   }).toList(),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:wato/learn/learn_screen.dart';
 import 'package:wato/profile/profile_page.dart';
+import 'package:wato/recent_class.dart';
 
 import 'home_page.dart';
 
@@ -15,6 +17,8 @@ class ExplorePageState extends State<ExplorePage> {
   final List<Widget> _pages = [
     const HomePage(),
     const ProfilePage(),
+    const LearnScreen(),
+    const RecentClass(),
   ];
 
   @override

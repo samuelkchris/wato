@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "777689608195",
+    "firebase_url": "https://wato-ac064-default-rtdb.firebaseio.com",
+    "project_id": "wato-ac064",
+    "storage_bucket": "wato-ac064.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:777689608195:android:ec0de246e6a4158eaede36",
+        "android_client_info": {
+          "package_name": "com.example.wato"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "777689608195-k3a05a0kampstp8u7pbahr5k044ml1oa.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.wato",
+            "certificate_hash": "621950e9a636248397683f175d27cf0c6c6611ed"
+          }
+        },
+        {
+          "client_id": "777689608195-ahkkkc391i4068449f5bnffl6prt2jo2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBxVYUINNULj_tntayyKIeHvoXky4md21s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "777689608195-ahkkkc391i4068449f5bnffl6prt2jo2.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "777689608195-cne0sb563p5ju1kfefo8snvoej8b575k.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.wato"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
